@@ -8,8 +8,6 @@ from CollectionEntry import CollectionEntry
 
 # Example text embeddings (replace with your own)
 texts = ["apple", "banana", "orange", "grape", "kiwi", "pear"]
- # Replace with your actual embeddings
-
 
 # Function to plot embeddings using PCA or t-SNE
 def visualize_embeddings(embeddings, method='PCA'):
@@ -46,11 +44,6 @@ def visualize_embeddings_tsne(embeddings, perplexity=30):
     plt.xlabel('Dimension 1')
     plt.ylabel('Dimension 2')
     plt.show()
-# # Visualize using PCA
-# visualize_embeddings(embeddings, method='PCA')
-#
-# # Visualize using t-SNE
-# visualize_embeddings(embeddings, method='t-SNE')
 
 
 def main():

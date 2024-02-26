@@ -2,6 +2,8 @@ from CollectionEntry import CollectionEntry
 import chromadb
 from chromadb.utils import embedding_functions
 
+#ChromaDB for some reason doesnt work with class as wrapper (No OOP).
+
 
 def addEntry(collection, collectionEntry: CollectionEntry):
     collection.add(
