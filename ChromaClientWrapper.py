@@ -12,6 +12,18 @@ def addEntry(collection, collectionEntry: CollectionEntry):
         ids=[collectionEntry.id]
     )
 
+def isMetadataPrimitive(metadata):
+    return isinstance(metadata, (str, int, float, bool))
+
+def upsertEntry(collection, collectionEntry: CollectionEntry):
+    #Remove all metadata that is not a str, int, float or bool
+    collectionEntry.metadata = {k: v for k, v in collectionEntry.metadata.items() if isMetadataPrimitive(v)}
+
+    collection.upsert(
+        documents=collectionEntry.document,
+        metadatas=[collectionEntry.metadata],
+        ids=[collectionEntry.id]
+    )
 
 def query(collection, queryTexts, topK=10, where=None, whereDocuments=None):
     return collection.query(
@@ -59,9 +71,19 @@ if __name__ == '__main__':
 
       All values will be positive integers or floats, or zero.
       """
-    collectionEntry = CollectionEntry(testProblem, {"test": "test"}, id_generatingStrategy="md5")
 
-    addEntry(collection, collectionEntry)
+    testProblem2 = """
+    Write python code to find the factorial of a number
+    """
+
+    collectionEntry = CollectionEntry(testProblem, {"test": "test"}, id_generatingStrategy="md5")
+    collectionEntry2 = CollectionEntry(testProblem2, {"test": "test"}, id_generatingStrategy="md5")
+
+    # addEntry(collection, collectionEntry)
+    upsertEntry(collection, collectionEntry)
+    upsertEntry(collection, collectionEntry2)
+    print(collection.count())
+
     allEmbeddings = getAllEmbeddings(collection)
 
 
