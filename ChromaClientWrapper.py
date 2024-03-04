@@ -12,6 +12,7 @@ def addEntry(collection, collectionEntry: CollectionEntry):
         ids=[collectionEntry.id]
     )
 
+    #For whatever reason chromaDB doesnt save embeddings in the embeddings field. The embeddings exists, but must be retrieved separately
 def isMetadataPrimitive(metadata):
     return isinstance(metadata, (str, int, float, bool))
 
@@ -25,6 +26,14 @@ def upsertEntry(collection, collectionEntry: CollectionEntry):
         ids=[collectionEntry.id]
     )
 
+    #For whatever reason chromaDB doesnt save embeddings in the embeddings field. The embeddings exists, but must be retrieved separately
+    # collection.upsert(
+    #     documents=collectionEntry.document,
+    #     metadatas=[collectionEntry.metadata],
+    #     embeddings=getEmbeddingById(collection, collectionEntry.id)["embeddings"],
+    #     ids=[collectionEntry.id]
+    # )
+
 def query(collection, queryTexts, topK=10, where=None, whereDocuments=None):
     return collection.query(
         query_texts=queryTexts,
@@ -37,11 +46,28 @@ def query(collection, queryTexts, topK=10, where=None, whereDocuments=None):
 def getAllEmbeddings(collection):
     return collection.get(include=["embeddings"])
 
+def getAllIds(collection):
+    return collection.get(include=["ids"])
 
-def getEmbedding(collection, id):
+def getEntryById(collection, id):
+    return collection.get(ids=[id])
+
+def getEmbeddingById(collection, id):
     return collection.get(ids=[id], include=["embeddings"])
 
 def initCollection(client, collectionName, collectionMetadata=None, embeddingModel="all-MiniLM-L6-v2"):
+    """
+    Initialize a new collection in the database with the specified name and optional metadata.
+
+    Parameters:
+        client (Client): The client object for connecting to the database.
+        collectionName (str): The name of the collection to be created.
+        collectionMetadata (dict, optional): Additional metadata for the collection. Defaults to None.
+        embeddingModel (str): The embedding model to be used. Defaults to "all-MiniLM-L6-v2".
+
+    Returns:
+        Collection: The newly created or existing collection object.
+    """
     collectionMetadata = {"hnsw:space": "cosine"} if collectionMetadata is None else collectionMetadata
 
     sentenceTransformerEmbeddingFunction = embedding_functions.SentenceTransformerEmbeddingFunction(
@@ -56,8 +82,28 @@ def initCollection(client, collectionName, collectionMetadata=None, embeddingMod
 
 
 def initChromaClient(path="./data"):
+    """
+    Initializes a Chroma client with the specified path.
+
+    :param path: The path to the data directory (default="./data").
+    :return: A PersistentClient object.
+    """
     client = chromadb.PersistentClient(path=path)
     return client
+
+def initChroma(collectionName):
+    """
+    Initializes the Chroma client and a specific collection.
+
+    Parameters:
+        collectionName (str): The name of the collection to initialize (get or create).
+
+    Returns:
+        tuple: A tuple containing the client and the initialized collection.
+    """
+    client = initChromaClient()
+    collection = initCollection(client, collectionName)
+    return client, collection
 
 # test
 if __name__ == '__main__':

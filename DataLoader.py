@@ -1,5 +1,7 @@
-from ChromaClientWrapper import initChromaClient, initCollection, upsertEntry, addEntry
+from ChromaClientWrapper import initChromaClient, initCollection, upsertEntry, addEntry, initChroma, getEntryById, \
+    getEmbeddingById, getAllEmbeddings
 from CollectionEntry import CollectionEntry
+from DataAnalyzer import calculateCosineSimilarity
 from datasets import load_dataset
 
 def loadMbpp(isFullSubset=False):
@@ -54,7 +56,7 @@ def sanitizeMetadata(metadata):
     return sanitizedMetadata
 
 
-if __name__ == '__main__':
+def manualTest():
     # mbpp = loadMbpp()
     mbpp = loadMbppOffline()
     print("Length of train", len(mbpp["train"]))
@@ -82,3 +84,30 @@ if __name__ == '__main__':
 
 
     # print(mbpp["train"][0])
+
+def main():
+    collectionName = "mbpp-sanitized"
+    client, collection = initChroma(collectionName)
+    print("Number of items in the collection ",collectionName ,  collection.count())
+    # print(collection.get())
+
+    # print(getEntryById(collection, "100"))
+    # print(getEntryById(collection, "101"))
+    # print(getEmbedding(collection, "100"))
+    # print(getEmbedding(collection, "101"))
+
+    # a = getEmbedding(collection, "100")["embeddings"][0]
+    # b = getEmbedding(collection, "101")["embeddings"][0]
+    #
+    # print(calculateCosineSimilarity(a, b))
+
+    # print(type(getAllEmbeddings(collection)))
+    print(getEntryById(collection, "100")["embeddings"])
+
+
+
+#todo: visualize the embeddings using similarity matrix with cosine distance as metrics.
+#make a plot for this, maybe use heatmap-related visualzation?
+#consider seaborn
+if __name__ == '__main__':
+    main()

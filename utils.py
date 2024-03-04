@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
-from ChromaClientWrapper import initChromaClient, initCollection, addEntry, getAllEmbeddings
+from ChromaClientWrapper import initChromaClient, initCollection, addEntry, getAllEmbeddings, getEntryById, getEmbeddingById
 from CollectionEntry import CollectionEntry
 
 # Example text embeddings (replace with your own)
@@ -57,15 +57,30 @@ def main():
 
           All values will be positive integers or floats, or zero.
           """
+
+    impossibleProblem = """
+        Find cure for cancer
+    """
+
     collectionEntry = CollectionEntry(testProblem, {"test": "test"}, id_generatingStrategy="md5")
+    impossibleProblemEntry = CollectionEntry(impossibleProblem, {"test": "test"}, id_generatingStrategy="md5")
 
     addEntry(collection, collectionEntry)
+    addEntry(collection, impossibleProblemEntry)
 
     allEmbeddings = getAllEmbeddings(collection)
-
+    print(allEmbeddings)
     print(allEmbeddings['embeddings'][0])
-    visualize_embeddings_tsne(allEmbeddings['embeddings'][0])
+    print(allEmbeddings['embeddings'][1])
+
+
+    print(getEmbeddingById(collection, "18e128fea54dac74c87b83058d475ec1"))
+    print(getEmbeddingById(collection, "4da16acecdeff176803f9213b1b0614e"))
+    # visualize_embeddings_tsne(allEmbeddings['embeddings'][0])
     # visualize_embeddings(np.array(allEmbeddings['embeddings'][0]), method='t-SNE')
+
+    print(collection.get())
+    print(getEntryById(collection, "18e128fea54dac74c87b83058d475ec1"))
 
     client.delete_collection("problemstore")
 
